@@ -279,15 +279,26 @@ function submitAllSales() {
 
     progress.innerHTML = `Submitting ${index + 1}/${currentSales.length} items...`;
     
+    function updateProductStock(soldItems) {
+  soldItems.forEach(item => {
+    const product = products.find(p => p.name === item.item);
+    if (product && product.stock !== undefined) {
+      product.stock -= item.quantity;
+    }
+  });
+  return saveProducts();
+}
+    
     submitSaleToGoogleForm(currentSales[index])
-      .then(() => {
-        successCount++;
-        submitNext(index + 1);
-      })
-      .catch(err => {
-        errors.push({ index, error: err });
-        submitNext(index + 1);
-      });
+  .then(() => updateProductStock([currentSales[index]]))
+  .then(() => {
+    successCount++;
+    submitNext(index + 1);
+  })
+  .catch(err => {
+    errors.push({ index, error: err });
+    submitNext(index + 1);
+  });
   };
 
   submitNext(0);
@@ -325,5 +336,6 @@ function submitSaleToGoogleForm(sale) {
     body: formData.toString()
   });
 }
+
 
 
