@@ -89,15 +89,30 @@ function populateDatalist() {
 document.getElementById('item').addEventListener('input', updatePrice);
 document.getElementById('unit').addEventListener('change', updatePrice);
 
+// Add this function to update stock display
+function updateStockDisplay(itemName) {
+  const product = products.find(p => p.name.toLowerCase() === itemName.toLowerCase());
+  const stockDisplay = document.getElementById('stock-display');
+  
+  if (product && stockDisplay) {
+    stockDisplay.textContent = `Remaining Stock: ${product.stock || 0}`;
+    stockDisplay.style.color = product.stock <= 5 ? 'red' : 'green';
+  } else if (stockDisplay) {
+    stockDisplay.textContent = '';
+  }
+}
 function updatePrice() {
   const itemName = document.getElementById('item').value.trim();
   const unit = document.getElementById('unit').value;
   const product = products.find(p => p.name.toLowerCase() === itemName.toLowerCase());
+  
   if (product) {
     const price = product.prices[unit];
     document.getElementById('price').value = price;
+    updateStockDisplay(itemName); // Add this line
   } else {
     document.getElementById('price').value = '';
+    updateStockDisplay(''); // Clear stock display if no product
   }
   calculateTotal();
 }
@@ -310,4 +325,5 @@ function submitSaleToGoogleForm(sale) {
     body: formData.toString()
   });
 }
+
 
